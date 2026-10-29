@@ -68,6 +68,7 @@ flutter:
   assets:
     - assets/rules/
     - assets/fonts/
+    - assets/images/
 
   fonts:
     - family: NotoSans

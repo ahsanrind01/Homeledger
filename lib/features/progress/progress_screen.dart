@@ -9,6 +9,7 @@ import '../../domain/progress_calculator.dart';
 import '../../domain/requirement_caption.dart';
 import '../../domain/rule_resolution.dart';
 import '../children/add_child_screen.dart';
+import '../../app/kids_visuals.dart';
 
 /// Screen displaying complete academic progress for a child.
 /// Disclaimers: Records tool, not legal advice.
@@ -258,19 +259,31 @@ class ProgressScreen extends ConsumerWidget {
       items.add(_SummaryItem(
         label: 'Required',
         value: formatMinutes(progress.requiredMinutes!),
+        icon: Icons.flag_rounded,
+        color: const Color(0xFF4F46E5),
+        bgColor: const Color(0xFFEEF2FF),
       ));
       items.add(_SummaryItem(
         label: 'Done',
         value: formatMinutes(progress.minutesDone),
+        icon: Icons.check_circle_rounded,
+        color: const Color(0xFF059669),
+        bgColor: const Color(0xFFD1FAE5),
       ));
     } else if (progress.requiredDays != null) {
       items.add(_SummaryItem(
         label: 'Required',
         value: '${progress.requiredDays} days',
+        icon: Icons.flag_rounded,
+        color: const Color(0xFF4F46E5),
+        bgColor: const Color(0xFFEEF2FF),
       ));
       items.add(_SummaryItem(
         label: 'Done',
         value: '${progress.daysLogged} days',
+        icon: Icons.check_circle_rounded,
+        color: const Color(0xFF059669),
+        bgColor: const Color(0xFFD1FAE5),
       ));
     }
 
@@ -279,11 +292,17 @@ class ProgressScreen extends ConsumerWidget {
       items.add(_SummaryItem(
         label: 'Expected to date',
         value: formatMinutes(progress.expectedMinutes!),
+        icon: Icons.trending_up_rounded,
+        color: const Color(0xFFD97706),
+        bgColor: const Color(0xFFFEF3C7),
       ));
     } else if (progress.expectedDays != null) {
       items.add(_SummaryItem(
         label: 'Expected to date',
         value: '${progress.expectedDays} days',
+        icon: Icons.trending_up_rounded,
+        color: const Color(0xFFD97706),
+        bgColor: const Color(0xFFFEF3C7),
       ));
     }
 
@@ -292,11 +311,17 @@ class ProgressScreen extends ConsumerWidget {
       items.add(_SummaryItem(
         label: 'Remaining',
         value: formatMinutes(progress.minutesRemaining!),
+        icon: Icons.hourglass_bottom_rounded,
+        color: const Color(0xFF0284C7),
+        bgColor: const Color(0xFFE0F2FE),
       ));
     } else if (progress.daysRemaining != null) {
       items.add(_SummaryItem(
         label: 'Remaining',
         value: '${progress.daysRemaining} days',
+        icon: Icons.hourglass_bottom_rounded,
+        color: const Color(0xFF0284C7),
+        bgColor: const Color(0xFFE0F2FE),
       ));
     }
 
@@ -304,13 +329,16 @@ class ProgressScreen extends ConsumerWidget {
     items.add(_SummaryItem(
       label: 'Days left in year',
       value: '${progress.daysRemainingInYear} days',
+      icon: Icons.calendar_today_rounded,
+      color: const Color(0xFFE11D48),
+      bgColor: const Color(0xFFFFE4E6),
     ));
 
     return Container(
-      padding: const EdgeInsets.all(18.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: theme.colorScheme.outlineVariant,
           width: 1,
@@ -319,30 +347,61 @@ class ProgressScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Overview',
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.1,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEEF2FF),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.auto_graph_rounded,
+                  size: 16,
+                  color: Color(0xFF4F46E5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Overview',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ...items.map((item) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: item.bgColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      item.icon,
+                      size: 14,
+                      color: item.color,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   Text(
                     item.label,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const Spacer(),
                   Text(
                     item.value,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -498,24 +557,40 @@ class ProgressScreen extends ConsumerWidget {
             final minutes = entry.value;
             final fraction = (minutes / maxMinutes).clamp(0.0, 1.0);
 
+            final visual = KidsVisuals.getSubjectVisual(subject.name, isCore: subject.isCore);
+
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              padding: const EdgeInsets.symmetric(vertical: 7.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        subject.isCore ? '${subject.name} (Core)' : subject.name,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: visual.bgColor,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(visual.icon, size: 14, color: visual.color),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            subject.isCore ? '${subject.name} (Core)' : subject.name,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
                       Text(
                         formatMinutes(minutes),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
+                          color: visual.color,
                         ),
                       ),
                     ],
@@ -533,9 +608,7 @@ class ProgressScreen extends ConsumerWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: subject.isCore
-                                  ? [theme.colorScheme.primary, const Color(0xFF14B8A6)]
-                                  : [theme.colorScheme.secondary, const Color(0xFF64748B)],
+                              colors: [visual.color, visual.badgeColor],
                             ),
                           ),
                         ),
@@ -555,9 +628,15 @@ class ProgressScreen extends ConsumerWidget {
 class _SummaryItem {
   final String label;
   final String value;
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
 
   const _SummaryItem({
     required this.label,
     required this.value,
+    this.icon = Icons.insights_rounded,
+    this.color = const Color(0xFF4F46E5),
+    this.bgColor = const Color(0xFFEEF2FF),
   });
 }

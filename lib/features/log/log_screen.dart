@@ -8,6 +8,7 @@ import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../domain/log_validator.dart';
 import '../subjects/subjects_screen.dart';
+import '../../app/kids_visuals.dart';
 
 /// Screen to log daily learning time for a specific child and date.
 class LogScreen extends ConsumerStatefulWidget {
@@ -557,8 +558,17 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                         children: [
                           ...subjects.map((subject) {
                             final isSelected = subject.id == _selectedSubjectId;
+                            final visual = KidsVisuals.getSubjectVisual(
+                              subject.name,
+                              isCore: subject.isCore,
+                            );
                             return ChoiceChip(
                               key: ValueKey('subject_chip_${subject.id}'),
+                              avatar: Icon(
+                                visual.icon,
+                                size: 16,
+                                color: isSelected ? Colors.white : visual.color,
+                              ),
                               label: Text(
                                 subject.isCore ? '${subject.name} (Core)' : subject.name,
                               ),
@@ -745,6 +755,10 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                     ...entries.map((entry) {
                       final subject = subjectMap[entry.subjectId];
                       final subjectName = subject?.name ?? 'Unknown Subject';
+                      final visual = KidsVisuals.getSubjectVisual(
+                        subjectName,
+                        isCore: subject?.isCore ?? false,
+                      );
 
                       return Container(
                         key: ValueKey('entry_card_${entry.id}'),
@@ -762,13 +776,18 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                             horizontal: 16.0,
                             vertical: 6.0,
                           ),
-                          leading: CircleAvatar(
-                            radius: 17,
-                            backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                            foregroundColor: theme.colorScheme.primary,
-                            child: Text(
-                              subjectName.isNotEmpty ? subjectName[0].toUpperCase() : '?',
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                          leading: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: visual.bgColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: visual.badgeColor, width: 1.2),
+                            ),
+                            child: Icon(
+                              visual.icon,
+                              color: visual.color,
+                              size: 19,
                             ),
                           ),
                           title: Row(
