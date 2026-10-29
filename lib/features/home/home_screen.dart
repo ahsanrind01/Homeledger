@@ -18,6 +18,18 @@ import '../paywall/paywall_screen.dart';
 import '../../domain/feature_policy.dart';
 import '../../app/kids_visuals.dart';
 
+/// State notifier for active bottom navigation tab in HomeScreen.
+class HomeTabNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void setTab(int index) => state = index;
+}
+
+/// Provider for active bottom navigation tab in HomeScreen.
+final homeTabProvider =
+    NotifierProvider<HomeTabNotifier, int>(HomeTabNotifier.new);
+
 /// The primary Home screen dashboard for daily logging, status, and shortcuts.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -26,12 +38,41 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final childrenAsync = ref.watch(childrenStreamProvider);
+    final currentTab = ref.watch(homeTabProvider);
+    final hasChildren = childrenAsync.value?.isNotEmpty ?? false;
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        titleSpacing: 20,
-        title: Row(
+    Widget titleWidget;
+    switch (currentTab) {
+      case 1:
+        titleWidget = Text(
+          'Progress',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        );
+        break;
+      case 2:
+        titleWidget = Text(
+          'Work samples',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        );
+        break;
+      case 3:
+        titleWidget = Text(
+          'Export portfolio',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        );
+        break;
+      case 0:
+      default:
+        titleWidget = Row(
           children: [
             Container(
               width: 32,
@@ -62,7 +103,22 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ],
-        ),
+        );
+        break;
+    }
+
+    return PopScope(
+      canPop: currentTab == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && currentTab != 0) {
+          ref.read(homeTabProvider.notifier).setTab(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          titleSpacing: 20,
+          title: titleWidget,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 14.0),
@@ -105,7 +161,60 @@ class HomeScreen extends ConsumerWidget {
               orElse: () => children.first,
             );
 
-            return SingleChildScrollView(
+            return IndexedStack(
+              index: currentTab,
+              children: [
+                _buildHomeDashboard(context, ref, children, activeChild, theme),
+                ProgressScreen(childId: activeChild.id, asTab: true),
+                SampleLibraryScreen(childId: activeChild.id, asTab: true),
+                ExportOptionsScreen(initialChildId: activeChild.id, asTab: true),
+              ],
+            );
+          },
+        ),
+      ),
+      bottomNavigationBar: hasChildren
+          ? NavigationBar(
+              selectedIndex: currentTab,
+              onDestinationSelected: (index) {
+                ref.read(homeTabProvider.notifier).setTab(index);
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.bar_chart_outlined),
+                  selectedIcon: Icon(Icons.bar_chart_rounded),
+                  label: 'Progress',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.folder_outlined),
+                  selectedIcon: Icon(Icons.folder_rounded),
+                  label: 'Portfolio',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.description_outlined),
+                  selectedIcon: Icon(Icons.description_rounded),
+                  label: 'Reports',
+                ),
+              ],
+            )
+          : null,
+      ),
+    );
+  }
+
+  Widget _buildHomeDashboard(
+    BuildContext context,
+    WidgetRef ref,
+    List<Child> children,
+    Child activeChild,
+    ThemeData theme,
+  ) {
+    return SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
               child: Column(
@@ -204,10 +313,6 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
             );
-          },
-        ),
-      ),
-    );
   }
 
   Widget _buildSingleChildHeader(BuildContext context, Child child, ThemeData theme) {

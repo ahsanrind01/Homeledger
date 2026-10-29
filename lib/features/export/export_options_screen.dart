@@ -12,9 +12,12 @@ import '../paywall/paywall_screen.dart';
 class ExportOptionsScreen extends ConsumerStatefulWidget {
   final int? initialChildId;
 
+  final bool asTab;
+
   const ExportOptionsScreen({
     super.key,
     this.initialChildId,
+    this.asTab = false,
   });
 
   @override
@@ -33,6 +36,14 @@ class _ExportOptionsScreenState extends ConsumerState<ExportOptionsScreen> {
   void initState() {
     super.initState();
     _selectedChildId = widget.initialChildId;
+  }
+
+  @override
+  void didUpdateWidget(ExportOptionsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialChildId != null && widget.initialChildId != oldWidget.initialChildId) {
+      _selectedChildId = widget.initialChildId;
+    }
   }
 
   void _syncDefaultDatesForChild(Child child) {
@@ -138,12 +149,7 @@ class _ExportOptionsScreenState extends ConsumerState<ExportOptionsScreen> {
     final theme = Theme.of(context);
     final childrenAsync = ref.watch(childrenStreamProvider);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Export portfolio'),
-      ),
-      body: childrenAsync.when(
+    final bodyContent = childrenAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
         data: (children) {
@@ -372,7 +378,18 @@ class _ExportOptionsScreenState extends ConsumerState<ExportOptionsScreen> {
             ),
           );
         },
+      );
+
+    if (widget.asTab) {
+      return bodyContent;
+    }
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Export portfolio'),
       ),
+      body: bodyContent,
     );
   }
 }

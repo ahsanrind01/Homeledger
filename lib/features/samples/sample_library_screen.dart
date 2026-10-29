@@ -16,10 +16,12 @@ import '../paywall/paywall_screen.dart';
 /// with subject and date range filtering, and capture trigger.
 class SampleLibraryScreen extends ConsumerStatefulWidget {
   final int childId;
+  final bool asTab;
 
   const SampleLibraryScreen({
     super.key,
     required this.childId,
+    this.asTab = false,
   });
 
   @override
@@ -112,32 +114,7 @@ class _SampleLibraryScreenState extends ConsumerState<SampleLibraryScreen> {
 
     final hasActiveFilter = _selectedSubjectId != null || _selectedDateRange != null;
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Work samples'),
-        actions: [
-          IconButton(
-            key: const ValueKey('library_scan_action_button'),
-            icon: isLocked
-                ? const Icon(Icons.lock_outline)
-                : const Icon(Icons.document_scanner_outlined),
-            tooltip: isLocked ? 'Scan work (Plus)' : 'Scan work',
-            onPressed: _startCapture,
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        key: const ValueKey('library_scan_fab'),
-        onPressed: _startCapture,
-        icon: isLocked
-            ? const Icon(Icons.lock_outline)
-            : const Icon(Icons.document_scanner),
-        label: isLocked
-            ? const Text('Scan work (Plus)')
-            : const Text('Scan work'),
-      ),
-      body: SafeArea(
+    final bodyContent = SafeArea(
         child: Column(
           children: [
             // 1. Filter Bar
@@ -351,7 +328,56 @@ class _SampleLibraryScreenState extends ConsumerState<SampleLibraryScreen> {
             ),
           ],
         ),
+      );
+
+    if (widget.asTab) {
+      return Stack(
+        children: [
+          bodyContent,
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton.extended(
+              key: const ValueKey('library_scan_fab'),
+              onPressed: _startCapture,
+              icon: isLocked
+                  ? const Icon(Icons.lock_outline)
+                  : const Icon(Icons.document_scanner),
+              label: isLocked
+                  ? const Text('Scan work (Plus)')
+                  : const Text('Scan work'),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Work samples'),
+        actions: [
+          IconButton(
+            key: const ValueKey('library_scan_action_button'),
+            icon: isLocked
+                ? const Icon(Icons.lock_outline)
+                : const Icon(Icons.document_scanner_outlined),
+            tooltip: isLocked ? 'Scan work (Plus)' : 'Scan work',
+            onPressed: _startCapture,
+          ),
+        ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        key: const ValueKey('library_scan_fab'),
+        onPressed: _startCapture,
+        icon: isLocked
+            ? const Icon(Icons.lock_outline)
+            : const Icon(Icons.document_scanner),
+        label: isLocked
+            ? const Text('Scan work (Plus)')
+            : const Text('Scan work'),
+      ),
+      body: bodyContent,
     );
   }
 }

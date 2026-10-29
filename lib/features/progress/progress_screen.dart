@@ -15,10 +15,12 @@ import '../../app/kids_visuals.dart';
 /// Disclaimers: Records tool, not legal advice.
 class ProgressScreen extends ConsumerWidget {
   final int childId;
+  final bool asTab;
 
   const ProgressScreen({
     super.key,
     required this.childId,
+    this.asTab = false,
   });
 
   @override
@@ -26,12 +28,7 @@ class ProgressScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final progressAsync = ref.watch(childProgressProvider(childId));
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Progress'),
-      ),
-      body: progressAsync.when(
+    final bodyContent = progressAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error loading progress: $err')),
         data: (state) {
@@ -100,7 +97,18 @@ class ProgressScreen extends ConsumerWidget {
             ),
           );
         },
+      );
+
+    if (asTab) {
+      return SafeArea(child: bodyContent);
+    }
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Progress'),
       ),
+      body: bodyContent,
     );
   }
 
