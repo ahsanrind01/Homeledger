@@ -436,57 +436,75 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   // --- Date Row ---
-                  Card(
-                    elevation: 0,
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 12.0,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: theme.colorScheme.outlineVariant,
+                        width: 1,
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 20,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12.0,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.calendar_today_rounded,
+                            size: 18,
                             color: theme.colorScheme.primary,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Date',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'DATE',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
                                 ),
-                                Text(
-                                  dayStr == formatIsoDate(clock)
-                                      ? '$dayStr (Today)'
-                                      : dayStr,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                dayStr == formatIsoDate(clock)
+                                    ? '$dayStr (Today)'
+                                    : dayStr,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(48, 44),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(48, 48),
-                            ),
-                            icon: const Icon(Icons.edit_calendar, size: 18),
-                            label: const Text('Change date'),
-                            onPressed: () => _pickDate(clock),
-                          ),
-                        ],
-                      ),
+                          icon: const Icon(Icons.edit_calendar_rounded, size: 16),
+                          label: const Text('Change date'),
+                          onPressed: () => _pickDate(clock),
+                        ),
+                      ],
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
 
                   // --- Subject Selection Chips ---
                   Row(
@@ -728,21 +746,38 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                       final subject = subjectMap[entry.subjectId];
                       final subjectName = subject?.name ?? 'Unknown Subject';
 
-                      return Card(
+                      return Container(
                         key: ValueKey('entry_card_${entry.id}'),
-                        margin: const EdgeInsets.only(bottom: 8.0),
-                        elevation: 1,
+                        margin: const EdgeInsets.only(bottom: 10.0),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant,
+                            width: 1,
+                          ),
+                        ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
-                            vertical: 4.0,
+                            vertical: 6.0,
+                          ),
+                          leading: CircleAvatar(
+                            radius: 17,
+                            backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                            foregroundColor: theme.colorScheme.primary,
+                            child: Text(
+                              subjectName.isNotEmpty ? subjectName[0].toUpperCase() : '?',
+                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                            ),
                           ),
                           title: Row(
                             children: [
                               Text(
                                 subjectName,
                                 style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.1,
                                 ),
                               ),
                               if (subject?.isCore == true) ...[
@@ -753,25 +788,32 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: theme.colorScheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(4),
+                                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     'Core',
-                                    style:
-                                        theme.textTheme.labelSmall?.copyWith(
-                                      color: theme
-                                          .colorScheme.onPrimaryContainer,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
                                     ),
                                   ),
                                 ),
                               ],
                               const Spacer(),
-                              Text(
-                                formatMinutes(entry.minutes),
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  formatMinutes(entry.minutes),
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: theme.colorScheme.primary,
+                                  ),
                                 ),
                               ),
                             ],
@@ -781,7 +823,9 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
                                     entry.note!,
-                                    style: theme.textTheme.bodySmall,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
                                   ),
                                 )
                               : null,
@@ -789,7 +833,7 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit_outlined, size: 20),
+                                icon: const Icon(Icons.edit_outlined, size: 19),
                                 tooltip: 'Edit entry',
                                 onPressed: () => _editEntry(
                                   entry: entry,
@@ -799,7 +843,7 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, size: 20),
+                                icon: const Icon(Icons.delete_outline_rounded, size: 19),
                                 tooltip: 'Delete entry',
                                 onPressed: () =>
                                     _deleteEntry(entry, subjectName),

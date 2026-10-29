@@ -29,18 +29,63 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(AppStrings.appName),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Open settings',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const SettingsScreen(),
+        titleSpacing: 20,
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.colorScheme.primary,
+                    theme.colorScheme.tertiary,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              );
-            },
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.auto_stories_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              AppStrings.appName,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 14.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant,
+                  width: 1,
+                ),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.settings_outlined, size: 20),
+                tooltip: 'Open settings',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -61,7 +106,7 @@ class HomeScreen extends ConsumerWidget {
 
             return SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -82,18 +127,13 @@ class HomeScreen extends ConsumerWidget {
                     },
                   ),
 
-                  // 1. Child selector (only visible when more than one child exists)
+                  // 1. Child selector / Active Child Header
                   if (children.length > 1) ...[
                     _buildChildSelector(context, ref, children, activeChild, theme),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
                   ] else ...[
-                    Text(
-                      activeChild.name,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    _buildSingleChildHeader(context, activeChild, theme),
+                    const SizedBox(height: 18),
                   ],
 
                   // 2. Status Card (On pace / Behind / Not started / Finished)
@@ -106,23 +146,27 @@ class HomeScreen extends ConsumerWidget {
 
                   const SizedBox(height: 20),
 
-                  // 4. Big "Log time" button
+                  // 4. Primary "Log time" action button
                   SizedBox(
-                    height: 56,
+                    height: 54,
                     child: FilledButton.icon(
                       key: const ValueKey('home_log_time_button'),
                       style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 56),
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        minimumSize: const Size(double.infinity, 54),
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      icon: const Icon(Icons.add_circle_outline, size: 24),
+                      icon: const Icon(Icons.add_circle_outline_rounded, size: 22),
                       label: Text(
                         'Log time',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: theme.colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
                         ),
                       ),
                       onPressed: () {
@@ -135,22 +179,29 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 26),
 
                   // Recent activity feed
                   _buildRecentActivitySection(context, ref, activeChild.id, theme),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 26),
 
-                  // 5. Shortcuts: Progress, Samples (disabled), Export (disabled), Settings
-                  Text(
-                    'Shortcuts',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  // 5. Shortcuts
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Shortcuts',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   _buildShortcutsGrid(context, ref, activeChild.id, theme),
+                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -160,23 +211,80 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSingleChildHeader(BuildContext context, Child child, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: theme.colorScheme.primaryContainer,
+            foregroundColor: theme.colorScheme.onPrimaryContainer,
+            child: Text(
+              child.name.isNotEmpty ? child.name[0].toUpperCase() : '?',
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  child.name,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                Text(
+                  'Homeschool Student',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState(BuildContext context, ThemeData theme) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(28.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.family_restroom,
-              size: 64,
-              color: theme.colorScheme.primary,
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.school_outlined,
+                size: 40,
+                color: theme.colorScheme.primary,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               'No child added yet',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
               ),
             ),
             const SizedBox(height: 8),
@@ -185,14 +293,12 @@ class HomeScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
+                height: 1.4,
               ),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(48, 48),
-              ),
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add_rounded),
               label: const Text('Add child'),
               onPressed: () {
                 Navigator.of(context).push(
@@ -215,45 +321,59 @@ class HomeScreen extends ConsumerWidget {
     Child activeChild,
     ThemeData theme,
   ) {
-    return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Row(
-          children: [
-            Icon(
-              Icons.person,
-              size: 20,
-              color: theme.colorScheme.primary,
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: theme.colorScheme.primaryContainer,
+            foregroundColor: theme.colorScheme.onPrimaryContainer,
+            child: Text(
+              activeChild.name.isNotEmpty ? activeChild.name[0].toUpperCase() : '?',
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<int>(
-                  value: activeChild.id,
-                  isExpanded: true,
-                  items: children.map((c) {
-                    return DropdownMenuItem<int>(
-                      value: c.id,
-                      child: Text(
-                        c.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (newId) {
-                    if (newId != null) {
-                      ref.read(selectedChildIdProvider.notifier).select(newId);
-                    }
-                  },
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<int>(
+                value: activeChild.id,
+                isExpanded: true,
+                icon: Icon(
+                  Icons.unfold_more_rounded,
+                  size: 20,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
+                items: children.map((c) {
+                  return DropdownMenuItem<int>(
+                    value: c.id,
+                    child: Text(
+                      c.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (newId) {
+                  if (newId != null) {
+                    ref.read(selectedChildIdProvider.notifier).select(newId);
+                  }
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -267,74 +387,82 @@ class HomeScreen extends ConsumerWidget {
     final progressAsync = ref.watch(childProgressProvider(child.id));
 
     return progressAsync.when(
-      loading: () => const Card(
-        child: Padding(
-          padding: EdgeInsets.all(32.0),
-          child: Center(child: CircularProgressIndicator()),
+      loading: () => Container(
+        padding: const EdgeInsets.all(32.0),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
         ),
+        child: const Center(child: CircularProgressIndicator()),
       ),
-      error: (err, _) => Card(
-        color: theme.colorScheme.errorContainer,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text('Error: $err'),
+      error: (err, _) => Container(
+        padding: const EdgeInsets.all(18.0),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(20),
         ),
+        child: Text('Error: $err'),
       ),
       data: (state) {
         if (state == null) {
           return const SizedBox.shrink();
         }
 
-        // Rule is missing: show clear message with button to choose a rule. Never crash.
+        // Rule is missing: show clear message with button to choose a rule.
         if (state.isRuleMissing || state.progress == null) {
-          return Card(
+          return Container(
             key: const ValueKey('home_rule_missing_card'),
-            color: theme.colorScheme.errorContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: theme.colorScheme.onErrorContainer,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Rule missing',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onErrorContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'No state rule profile could be found for ${child.name}. Please choose or create a rule to view progress.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.errorContainer,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.colorScheme.error.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
                       color: theme.colorScheme.onErrorContainer,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    key: const ValueKey('home_choose_rule_button'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(48, 48),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Rule missing',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onErrorContainer,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => AddChildScreen(initialChild: child),
-                        ),
-                      );
-                    },
-                    child: const Text('Choose a rule'),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'No state rule profile could be found for ${child.name}. Please choose or create a rule to view progress.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onErrorContainer,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 14),
+                FilledButton(
+                  key: const ValueKey('home_choose_rule_button'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => AddChildScreen(initialChild: child),
+                      ),
+                    );
+                  },
+                  child: const Text('Choose a rule'),
+                ),
+              ],
             ),
           );
         }
@@ -344,17 +472,17 @@ class HomeScreen extends ConsumerWidget {
         final hasAnyLogs = recentLogs.isNotEmpty || progress.minutesDone > 0 || progress.daysLogged > 0;
 
         final statusColor = switch (progress.status) {
-          ProgressStatus.onPace => Colors.green.shade700,
-          ProgressStatus.finished => Colors.teal.shade700,
+          ProgressStatus.onPace => const Color(0xFF0F766E),
+          ProgressStatus.finished => const Color(0xFF0D9488),
           ProgressStatus.behind => theme.colorScheme.onSurfaceVariant,
           ProgressStatus.notStarted => theme.colorScheme.outline,
           ProgressStatus.invalidDates => theme.colorScheme.error,
         };
         final statusBg = switch (progress.status) {
-          ProgressStatus.onPace => Colors.green.withValues(alpha: 0.12),
-          ProgressStatus.finished => Colors.teal.withValues(alpha: 0.12),
-          ProgressStatus.behind => theme.colorScheme.surfaceContainerHighest,
-          ProgressStatus.notStarted => theme.colorScheme.surfaceContainerHighest,
+          ProgressStatus.onPace => const Color(0xFFCCFBF1),
+          ProgressStatus.finished => const Color(0xFFCCFBF1),
+          ProgressStatus.behind => theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+          ProgressStatus.notStarted => theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
           ProgressStatus.invalidDates => theme.colorScheme.errorContainer,
         };
 
@@ -373,146 +501,161 @@ class HomeScreen extends ConsumerWidget {
           requiredDays: progress.requiredDays,
         );
 
-        return Card(
+        return Container(
           key: const ValueKey('home_status_card'),
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+          padding: const EdgeInsets.all(22.0),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'School Year Progress',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (progress.metricRows.length > 1) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: statusBg,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                progress.status == ProgressStatus.behind
-                                    ? 'Flexible pace'
-                                    : progress.status.label,
-                                key: const ValueKey('home_overall_status_chip'),
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: statusColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ] else if (progress.metricRows.isEmpty) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: statusBg,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                progress.status.label,
-                                key: const ValueKey('home_overall_status_chip'),
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: statusColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    Text(
-                      percentStr,
-                      key: const ValueKey('home_percentage_text'),
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(
-                    value: percentVal,
-                    minHeight: 8,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      progress.status == ProgressStatus.finished
-                          ? Colors.teal
-                          : theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (progress.metricRows.isEmpty)
-                  Text(
-                    progressSummary,
-                    key: const ValueKey('home_progress_summary_text'),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )
-                else
-                  for (final row in progress.metricRows) ...[
-                    ProgressMetricRowWidget(row: row),
-                    if (row != progress.metricRows.last) const SizedBox(height: 8),
-                  ],
-                if (!hasAnyLogs) ...[
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.lightbulb_outline,
-                          color: theme.colorScheme.primary,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Welcome to ${child.name}\'s school year! Log your first lesson below to start tracking your hours and days.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        Text(
+                          'School Year Progress',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
                           ),
                         ),
+                        if (progress.metricRows.length > 1) ...[
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusBg,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              progress.status == ProgressStatus.behind
+                                  ? 'Flexible pace'
+                                  : progress.status.label,
+                              key: const ValueKey('home_overall_status_chip'),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: statusColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ] else if (progress.metricRows.isEmpty) ...[
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusBg,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              progress.status.label,
+                              key: const ValueKey('home_overall_status_chip'),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: statusColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
+                  Text(
+                    percentStr,
+                    key: const ValueKey('home_percentage_text'),
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1.0,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: percentVal,
+                  minHeight: 8,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    progress.status == ProgressStatus.finished
+                        ? const Color(0xFF0D9488)
+                        : theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (progress.metricRows.isEmpty)
+                Text(
+                  progressSummary,
+                  key: const ValueKey('home_progress_summary_text'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                )
+              else
+                for (final row in progress.metricRows) ...[
+                  ProgressMetricRowWidget(row: row),
+                  if (row != progress.metricRows.last) const SizedBox(height: 8),
+                ],
+              if (!hasAnyLogs) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Welcome to ${child.name}\'s school year! Log your first lesson below to start tracking your hours and days.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
         );
       },
@@ -526,69 +669,115 @@ class HomeScreen extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-          child: Card(
-            elevation: 0,
-            color:
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Today',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  todayAsync.when(
-                    loading: () => const Text('...'),
-                    error: (_, _) => const Text('0 min'),
-                    data: (mins) => Text(
-                      formatMinutes(mins),
-                      key: const ValueKey('home_today_total_text'),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant,
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.today_rounded,
+                        size: 16,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'TODAY',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                todayAsync.when(
+                  loading: () => const Text('...'),
+                  error: (_, _) => const Text('0 min'),
+                  data: (mins) => Text(
+                    formatMinutes(mins),
+                    key: const ValueKey('home_today_total_text'),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Card(
-            elevation: 0,
-            color:
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'This week',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  weekAsync.when(
-                    loading: () => const Text('...'),
-                    error: (_, _) => const Text('0 min'),
-                    data: (mins) => Text(
-                      formatMinutes(mins),
-                      key: const ValueKey('home_week_total_text'),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant,
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.date_range_rounded,
+                        size: 16,
+                        color: theme.colorScheme.tertiary,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'THIS WEEK',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                weekAsync.when(
+                  loading: () => const Text('...'),
+                  error: (_, _) => const Text('0 min'),
+                  data: (mins) => Text(
+                    formatMinutes(mins),
+                    key: const ValueKey('home_week_total_text'),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -611,7 +800,9 @@ class HomeScreen extends ConsumerWidget {
             Expanded(
               child: _ShortcutButton(
                 key: const ValueKey('shortcut_progress'),
-                icon: Icons.bar_chart,
+                icon: Icons.auto_graph_rounded,
+                iconColor: const Color(0xFF0F766E),
+                iconBg: const Color(0xFFCCFBF1),
                 label: 'Progress',
                 onPressed: () {
                   Navigator.of(context).push(
@@ -627,6 +818,8 @@ class HomeScreen extends ConsumerWidget {
               child: _ShortcutButton(
                 key: const ValueKey('shortcut_samples'),
                 icon: Icons.photo_library_outlined,
+                iconColor: const Color(0xFF2563EB),
+                iconBg: const Color(0xFFDBEAFE),
                 label: 'Samples',
                 onPressed: () {
                   Navigator.of(context).push(
@@ -646,6 +839,8 @@ class HomeScreen extends ConsumerWidget {
               child: _ShortcutButton(
                 key: const ValueKey('shortcut_export'),
                 icon: Icons.picture_as_pdf_outlined,
+                iconColor: const Color(0xFFD97706),
+                iconBg: const Color(0xFFFEF3C7),
                 label: 'Export',
                 isLocked: exportAccess.isLocked,
                 onPressed: () {
@@ -671,7 +866,9 @@ class HomeScreen extends ConsumerWidget {
             Expanded(
               child: _ShortcutButton(
                 key: const ValueKey('shortcut_settings'),
-                icon: Icons.settings_outlined,
+                icon: Icons.tune_rounded,
+                iconColor: const Color(0xFF475569),
+                iconBg: const Color(0xFFF1F5F9),
                 label: 'Settings',
                 onPressed: () {
                   Navigator.of(context).push(
@@ -707,7 +904,8 @@ class HomeScreen extends ConsumerWidget {
             Text(
               'Recent activity',
               style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
               ),
             ),
             TextButton(
@@ -733,44 +931,52 @@ class HomeScreen extends ConsumerWidget {
           error: (err, _) => Text('Error loading activity: $err'),
           data: (logs) {
             if (logs.isEmpty) {
-              return Card(
-                elevation: 0,
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              return Container(
+                padding: const EdgeInsets.all(18.0),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant,
+                    width: 1,
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Row(
-                    children: [
-                      Icon(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
                         Icons.history_toggle_off_rounded,
                         color: theme.colorScheme.onSurfaceVariant,
-                        size: 28,
+                        size: 22,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'No lessons logged yet',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'No lessons logged yet',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Lessons you record will appear here for quick daily review.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Lessons you record will appear here for quick daily review.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               );
             }
@@ -783,10 +989,15 @@ class HomeScreen extends ConsumerWidget {
 
             return Card(
               elevation: 0,
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+              color: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(
+                  color: theme.colorScheme.outlineVariant,
+                  width: 1,
+                ),
               ),
+              clipBehavior: Clip.antiAlias,
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -796,7 +1007,7 @@ class HomeScreen extends ConsumerWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  color: theme.colorScheme.outlineVariant,
                 ),
                 itemBuilder: (context, index) {
                   final entry = displayLogs[index];
@@ -806,14 +1017,14 @@ class HomeScreen extends ConsumerWidget {
 
                   return ListTile(
                     dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     leading: CircleAvatar(
-                      backgroundColor: theme.colorScheme.primaryContainer,
-                      foregroundColor: theme.colorScheme.onPrimaryContainer,
-                      radius: 16,
+                      backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                      foregroundColor: theme.colorScheme.primary,
+                      radius: 17,
                       child: Text(
                         subjectName.isNotEmpty ? subjectName[0].toUpperCase() : '?',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
                       ),
                     ),
                     title: Row(
@@ -822,46 +1033,57 @@ class HomeScreen extends ConsumerWidget {
                         Text(
                           subjectName,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.1,
                           ),
                         ),
-                        Text(
-                          formatMinutes(entry.minutes),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            formatMinutes(entry.minutes),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    subtitle: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (entry.note != null && entry.note!.trim().isNotEmpty)
-                          Expanded(
-                            child: Text(
-                              entry.note!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 2.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (entry.note != null && entry.note!.trim().isNotEmpty)
+                            Expanded(
+                              child: Text(
+                                entry.note!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            )
+                          else
+                            Text(
+                              subject?.isCore == true ? 'Core subject' : 'Elective',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                          )
-                        else
                           Text(
-                            subject?.isCore == true ? 'Core subject' : 'Elective',
+                            relativeDay,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                        Text(
-                          relativeDay,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     onTap: () {
                       DateTime? parsedDay;
@@ -904,6 +1126,8 @@ class HomeScreen extends ConsumerWidget {
 
 class _ShortcutButton extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
   final String label;
   final VoidCallback? onPressed;
   final bool isLocked;
@@ -912,6 +1136,8 @@ class _ShortcutButton extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
+    required this.iconColor,
+    required this.iconBg,
     this.onPressed,
     this.isLocked = false,
   });
@@ -921,52 +1147,61 @@ class _ShortcutButton extends StatelessWidget {
     final theme = Theme.of(context);
     final isEnabled = onPressed != null;
 
-    return Card(
-      elevation: 0,
-      color: isEnabled
-          ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7)
-          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+    return Container(
+      decoration: BoxDecoration(
+        color: isEnabled
+            ? theme.colorScheme.surface
+            : theme.colorScheme.surface.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 1,
         ),
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 22,
-                color: isEnabled
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.38),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: isEnabled
-                        ? theme.colorScheme.onSurface
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.38),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isEnabled ? iconBg : theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 18,
+                    color: isEnabled ? iconColor : theme.colorScheme.outline,
                   ),
                 ),
-              ),
-              if (isLocked) ...[
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.lock_outline,
-                  size: 16,
-                  color: theme.colorScheme.primary,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.1,
+                      color: isEnabled
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                  ),
                 ),
+                if (isLocked) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.lock_rounded,
+                    size: 15,
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -985,19 +1220,19 @@ class ProgressMetricRowWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final (chipBg, chipFg) = switch (row.status) {
       ProgressStatus.onPace => (
-        Colors.green.withValues(alpha: 0.12),
-        Colors.green.shade800,
+        const Color(0xFFCCFBF1),
+        const Color(0xFF0F766E),
       ),
       ProgressStatus.finished => (
-        Colors.teal.withValues(alpha: 0.12),
-        Colors.teal.shade800,
+        const Color(0xFFCCFBF1),
+        const Color(0xFF0D9488),
       ),
       ProgressStatus.behind => (
-        theme.colorScheme.surfaceContainerHighest,
+        theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
         theme.colorScheme.onSurfaceVariant,
       ),
       ProgressStatus.notStarted => (
-        theme.colorScheme.surfaceContainerHighest,
+        theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
         theme.colorScheme.outline,
       ),
       ProgressStatus.invalidDates => (
@@ -1012,7 +1247,7 @@ class ProgressMetricRowWidget extends StatelessWidget {
         Expanded(
           child: Text(
             row.label,
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1021,17 +1256,17 @@ class ProgressMetricRowWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 10,
-            vertical: 4,
+            vertical: 3,
           ),
           decoration: BoxDecoration(
             color: chipBg,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
             row.status.label,
             style: theme.textTheme.labelSmall?.copyWith(
               color: chipFg,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -1039,4 +1274,3 @@ class ProgressMetricRowWidget extends StatelessWidget {
     );
   }
 }
-

@@ -422,12 +422,13 @@ class _SampleThumbnailCardState extends ConsumerState<_SampleThumbnailCard> {
 
     return Card(
       key: ValueKey('sample_card_${sample.id}'),
-      elevation: 1,
+      elevation: 0,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: theme.colorScheme.outlineVariant,
+          width: 1,
         ),
       ),
       child: InkWell(

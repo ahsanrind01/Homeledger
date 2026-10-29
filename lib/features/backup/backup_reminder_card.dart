@@ -18,67 +18,84 @@ class BackupReminderCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: 0,
-      color: theme.colorScheme.secondaryContainer,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.colorScheme.secondary.withValues(alpha: 0.3)),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: theme.colorScheme.tertiary.withValues(alpha: 0.25),
+          width: 1.2,
+        ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.backup_outlined,
-                  color: theme.colorScheme.onSecondaryContainer,
-                  size: 24,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Backup recommended',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSecondaryContainer,
-                    ),
+                child: Icon(
+                  Icons.backup_rounded,
+                  color: theme.colorScheme.tertiary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Backup recommended',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.1,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'It has been over 30 days without a backup. Homeledger stores data only on this phone. Create a backup to keep your records safe.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSecondaryContainer,
               ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'It has been over 30 days without a backup. Homeledger stores data only on this phone. Create a backup to keep your records safe.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.4,
             ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () async {
-                    final now = ref.read(clockProvider);
-                    final settingsRepo = ref.read(settingsRepositoryProvider);
-                    await settingsRepo.dismissBackupReminder(formatIsoDate(now));
-                    ref.invalidate(shouldShowBackupReminderProvider);
-                  },
-                  child: const Text('Dismiss'),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
                 ),
-                const SizedBox(width: 8),
-                FilledButton.tonal(
-                  onPressed: onBackupNow,
-                  child: const Text('Back up now'),
+                onPressed: () async {
+                  final now = ref.read(clockProvider);
+                  final settingsRepo = ref.read(settingsRepositoryProvider);
+                  await settingsRepo.dismissBackupReminder(formatIsoDate(now));
+                  ref.invalidate(shouldShowBackupReminderProvider);
+                },
+                child: const Text('Dismiss'),
+              ),
+              const SizedBox(width: 8),
+              FilledButton.tonal(
+                style: FilledButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ],
-            ),
-          ],
-        ),
+                onPressed: onBackupNow,
+                child: const Text('Back up now'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

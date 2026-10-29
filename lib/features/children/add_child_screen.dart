@@ -587,30 +587,31 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
                       return Card(
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(18),
                           side: BorderSide(
                             color: _ruleError != null
                                 ? theme.colorScheme.error
                                 : theme.colorScheme.outlineVariant,
                           ),
                         ),
-                        color: theme.colorScheme.surfaceContainerLow,
+                        color: theme.colorScheme.surface,
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(18.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
                                   Icon(
-                                    Icons.track_changes,
+                                    Icons.track_changes_rounded,
                                     color: theme.colorScheme.primary,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Set up tracking goals',
                                     style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.1,
                                     ),
                                   ),
                                 ],
@@ -620,16 +621,17 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
                                 'Homeledger is parent-configured. Set your target hours, days, or both for this school year.',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
+                                  height: 1.4,
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 14),
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: [
                                   FilledButton.icon(
                                     onPressed: _showMakeCustomRuleDialog,
-                                    icon: const Icon(Icons.tune),
+                                    icon: const Icon(Icons.tune_rounded),
                                     label: const Text('Set up tracking goals'),
                                   ),
                                   OutlinedButton(
@@ -658,10 +660,10 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
                     return Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(18),
                         side: BorderSide(color: theme.colorScheme.outlineVariant),
                       ),
-                      color: theme.colorScheme.surfaceContainerLow,
+                      color: theme.colorScheme.surface,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
