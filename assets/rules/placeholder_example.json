@@ -1,0 +1,14 @@
+{
+  "id": "placeholder_example",
+  "label": "Example profile (not a real state)",
+  "requiredHours": 100,
+  "requiredDays": 100,
+  "coreSubjects": [
+    "Math",
+    "Reading"
+  ],
+  "sourceUrl": null,
+  "lastChecked": null,
+  "isCustom": false,
+  "notes": "PLACEHOLDER. Replace with verified data before release."
+}
