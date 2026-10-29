@@ -689,31 +689,31 @@ class _LogScreenState extends ConsumerState<LogScreen> {
 
                   const SizedBox(height: 12),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: FilledButton.icon(
-                      key: const ValueKey('custom_add_button'),
-                      icon: const Icon(Icons.add),
-                      label: const Text(
-                        'Add lesson',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        final mins = int.tryParse(
-                              _customMinutesController.text.trim(),
-                            ) ??
-                            0;
-                        _submitEntry(
-                          minutes: mins,
-                          currentDayMinutes: currentDayMinutes,
-                          subjects: subjects,
-                        );
-                      },
+                  FilledButton.icon(
+                    key: const ValueKey('custom_add_button'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
+                    icon: const Icon(Icons.add),
+                    label: const Text(
+                      'Add lesson',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: () {
+                      final mins = int.tryParse(
+                            _customMinutesController.text.trim(),
+                          ) ??
+                          0;
+                      _submitEntry(
+                        minutes: mins,
+                        currentDayMinutes: currentDayMinutes,
+                        subjects: subjects,
+                      );
+                    },
                   ),
 
                   const Divider(height: 36),

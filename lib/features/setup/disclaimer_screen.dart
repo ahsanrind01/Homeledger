@@ -95,52 +95,50 @@ class DisclaimerScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  height: 54,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    onPressed: () async {
-                      await ref
-                          .read(settingsRepositoryProvider)
-                          .setDisclaimerAccepted(true);
+                  ),
+                  onPressed: () async {
+                    await ref
+                        .read(settingsRepositoryProvider)
+                        .setDisclaimerAccepted(true);
 
-                      if (context.mounted) {
-                        if (onAccepted != null) {
-                          onAccepted!();
-                        } else {
-                          final children = await ref
-                              .read(childRepositoryProvider)
-                              .getAll();
-                          if (context.mounted) {
-                            if (children.isEmpty) {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const AddChildScreen(
-                                    isFirstChild: true,
-                                  ),
+                    if (context.mounted) {
+                      if (onAccepted != null) {
+                        onAccepted!();
+                      } else {
+                        final children = await ref
+                            .read(childRepositoryProvider)
+                            .getAll();
+                        if (context.mounted) {
+                          if (children.isEmpty) {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const AddChildScreen(
+                                  isFirstChild: true,
                                 ),
-                              );
-                            } else {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const HomeScreen(),
-                                ),
-                              );
-                            }
+                              ),
+                            );
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const HomeScreen(),
+                              ),
+                            );
                           }
                         }
                       }
-                    },
-                    child: const Text(
-                      'I understand',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    }
+                  },
+                  child: const Text(
+                    'I understand',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

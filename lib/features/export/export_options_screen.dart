@@ -343,27 +343,28 @@ class _ExportOptionsScreenState extends ConsumerState<ExportOptionsScreen> {
                     final exportAccess = ref.watch(featureAccessProvider(Feature.exportPdf));
                     final isLocked = exportAccess.isLocked;
 
-                    return SizedBox(
-                      height: 52,
-                      child: FilledButton.icon(
-                        icon: _isGenerating
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Icon(isLocked ? Icons.lock_outline : Icons.share_outlined),
-                        label: Text(
-                          _isGenerating
-                              ? 'Creating PDF...'
-                              : (isLocked ? 'Create PDF (Plus)' : 'Create PDF'),
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: _isGenerating ? null : _generatePdf,
+                    return FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
+                      icon: _isGenerating
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Icon(isLocked ? Icons.lock_outline : Icons.share_outlined),
+                      label: Text(
+                        _isGenerating
+                            ? 'Creating PDF...'
+                            : (isLocked ? 'Create PDF (Plus)' : 'Create PDF'),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: _isGenerating ? null : _generatePdf,
                     );
                   },
                 ),

@@ -148,36 +148,34 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: 20),
 
                   // 4. Primary "Log time" action button
-                  SizedBox(
-                    height: 54,
-                    child: FilledButton.icon(
-                      key: const ValueKey('home_log_time_button'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        minimumSize: const Size(double.infinity, 54),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                  FilledButton.icon(
+                    key: const ValueKey('home_log_time_button'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      minimumSize: const Size(double.infinity, 52),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      icon: const Icon(Icons.add_circle_outline_rounded, size: 22),
-                      label: Text(
-                        'Log time',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onPrimary,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => LogScreen(childId: activeChild.id),
-                          ),
-                        );
-                      },
                     ),
+                    icon: const Icon(Icons.add_circle_outline_rounded, size: 22),
+                    label: Text(
+                      'Log time',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => LogScreen(childId: activeChild.id),
+                        ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 26),

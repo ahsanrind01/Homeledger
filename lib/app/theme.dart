@@ -133,14 +133,15 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primaryLight,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 52),
+          minimumSize: const Size(double.infinity, 50),
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
             fontFamily: _fontFamily,
+            fontFamilyFallback: ['Roboto', 'sans-serif'],
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.2,
@@ -151,12 +152,14 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimaryLight,
           minimumSize: const Size(double.infinity, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           side: const BorderSide(color: AppColors.borderLight, width: 1.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
           textStyle: const TextStyle(
             fontFamily: _fontFamily,
+            fontFamilyFallback: ['Roboto', 'sans-serif'],
             fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
@@ -269,14 +272,15 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primaryDark,
           foregroundColor: const Color(0xFF042F2E),
-          minimumSize: const Size(double.infinity, 52),
+          minimumSize: const Size(double.infinity, 50),
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
             fontFamily: _fontFamily,
+            fontFamilyFallback: ['Roboto', 'sans-serif'],
             fontSize: 16,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.2,
@@ -287,12 +291,14 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimaryDark,
           minimumSize: const Size(double.infinity, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           side: const BorderSide(color: AppColors.borderDark, width: 1.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
           textStyle: const TextStyle(
             fontFamily: _fontFamily,
+            fontFamilyFallback: ['Roboto', 'sans-serif'],
             fontSize: 15,
             fontWeight: FontWeight.w600,
           ),

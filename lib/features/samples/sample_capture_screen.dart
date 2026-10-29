@@ -265,23 +265,24 @@ class _SampleCaptureScreenState extends ConsumerState<SampleCaptureScreen> {
               const SizedBox(height: 24),
 
               // 6. Save Button
-              SizedBox(
-                height: 52,
-                child: FilledButton.icon(
-                  key: const ValueKey('sample_save_button'),
-                  onPressed: _isSaving ? null : _saveSample,
-                  icon: _isSaving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.check),
-                  label: Text(_isSaving ? 'Processing & saving...' : 'Save sample'),
+              FilledButton.icon(
+                key: const ValueKey('sample_save_button'),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
+                onPressed: _isSaving ? null : _saveSample,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.check),
+                label: Text(_isSaving ? 'Processing & saving...' : 'Save sample'),
               ),
             ],
           ),

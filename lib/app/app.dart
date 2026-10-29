@@ -34,7 +34,17 @@ class HomeledgerApp extends StatelessWidget {
         physics: const ClampingScrollPhysics(),
       ),
       builder: (context, child) {
-        return ClockRefresher(child: child ?? const SizedBox());
+        final mediaQuery = MediaQuery.of(context);
+        // Protect layout and button text on phones with aggressive display scaling (e.g. Samsung One UI)
+        // by clamping the textScaler to a comfortable, accessible range [0.85, 1.25].
+        final clampedScaler = mediaQuery.textScaler.clamp(
+          minScaleFactor: 0.85,
+          maxScaleFactor: 1.25,
+        );
+        return MediaQuery(
+          data: mediaQuery.copyWith(textScaler: clampedScaler),
+          child: ClockRefresher(child: child ?? const SizedBox()),
+        );
       },
       home: home ?? const AppStartupGate(),
     );

@@ -858,23 +858,23 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
                 ],
 
                 // Save button
-                SizedBox(
-                  height: 48,
-                  child: FilledButton(
-                    onPressed: _isSaving ? null : _saveChild,
-                    child: _isSaving
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(widget.initialChild == null
-                            ? 'Save child'
-                            : 'Update child'),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
                   ),
+                  onPressed: _isSaving ? null : _saveChild,
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(widget.initialChild == null
+                          ? 'Save child'
+                          : 'Update child'),
                 ),
               ],
             ),
