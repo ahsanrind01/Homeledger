@@ -483,44 +483,27 @@ class HomeScreen extends ConsumerWidget {
         }
 
         final progress = state.progress!;
-        final recentLogs = ref.watch(childRecentLogsStreamProvider(child.id)).value ?? const [];
-        final hasAnyLogs = recentLogs.isNotEmpty || progress.minutesDone > 0 || progress.daysLogged > 0;
 
-        final int totalDays = progress.totalSchoolDays > 0 ? progress.totalSchoolDays : 300;
-        final int elapsedDays = progress.elapsedSchoolDays.clamp(0, totalDays);
-        final double benchmarkRatio = totalDays > 0 ? (elapsedDays / totalDays).clamp(0.0, 1.0) : 0.0;
-        final int benchmarkPct = (benchmarkRatio * 100).round();
-
-        final (statusColor, statusBg, statusIcon, statusEncouragement) = switch (progress.status) {
+        final (statusColor, statusBg) = switch (progress.status) {
           ProgressStatus.onPace => (
             const Color(0xFF0F766E),
             const Color(0xFFCCFBF1),
-            Icons.spa_rounded,
-            '🌱 Cruising smoothly on pace!',
           ),
           ProgressStatus.finished => (
             const Color(0xFF0D9488),
             const Color(0xFFCCFBF1),
-            Icons.emoji_events_rounded,
-            '🏆 Goal accomplished! Outstanding!',
           ),
           ProgressStatus.behind => (
             const Color(0xFFD97706),
             const Color(0xFFFEF3C7),
-            Icons.trending_up_rounded,
-            '🌱 Flexible pace • Steady progress!',
           ),
           ProgressStatus.notStarted => (
             theme.colorScheme.onSurfaceVariant,
             theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-            Icons.explore_rounded,
-            '🚀 Ready for today\'s adventure!',
           ),
           ProgressStatus.invalidDates => (
             theme.colorScheme.error,
             theme.colorScheme.errorContainer,
-            Icons.calendar_month_rounded,
-            'Check school calendar dates',
           ),
         };
 
@@ -529,8 +512,6 @@ class HomeScreen extends ConsumerWidget {
             : progress.percentOfDaysRequirement != null
                 ? '${progress.percentOfDaysRequirement!.toStringAsFixed(0)}%'
                 : '0%';
-
-        final percentVal = ((progress.percentOfRequirement ?? progress.percentOfDaysRequirement ?? 0.0) / 100.0).clamp(0.0, 1.0);
 
         final progressSummary = formatProgressSummary(
           minutesDone: progress.minutesDone,
@@ -541,19 +522,18 @@ class HomeScreen extends ConsumerWidget {
 
         return Container(
           key: const ValueKey('home_status_card'),
-          padding: const EdgeInsets.all(22.0),
+          padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: theme.colorScheme.outlineVariant,
-              width: 1.2,
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.7),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 14,
-                offset: const Offset(0, 4),
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -632,165 +612,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: percentVal,
-                  minHeight: 10,
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    progress.status == ProgressStatus.finished
-                        ? const Color(0xFF0D9488)
-                        : theme.colorScheme.primary,
-                  ),
-                ),
-              ),
-
-              // Diagrammatic Journey Pace Roadmap
-              Container(
-                margin: const EdgeInsets.only(top: 14),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Icon(statusIcon, size: 16, color: statusColor),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  statusEncouragement,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: statusColor,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (benchmarkPct > 0 && progress.status != ProgressStatus.finished)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 6),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEF3C7),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Target: $benchmarkPct%',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF92400E),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Visual milestone track
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: SizedBox(
-                        height: 7,
-                        width: double.infinity,
-                        child: Stack(
-                          children: [
-                            Container(
-                              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                            ),
-                            if (benchmarkRatio > 0)
-                              FractionallySizedBox(
-                                widthFactor: benchmarkRatio,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFDE68A).withValues(alpha: 0.45),
-                                    border: const Border(
-                                      right: BorderSide(color: Color(0xFFD97706), width: 2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            FractionallySizedBox(
-                              widthFactor: percentVal,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: progress.status == ProgressStatus.finished
-                                        ? [const Color(0xFF0D9488), const Color(0xFF10B981)]
-                                        : [theme.colorScheme.primary, const Color(0xFF2DD4BF)],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            '🏁 Start',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        if (benchmarkRatio > 0.15 && benchmarkRatio < 0.85)
-                          Flexible(
-                            child: Text(
-                              '📍 Calendar pace',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        Flexible(
-                          child: Text(
-                            '🏆 Goal',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               if (progress.metricRows.isEmpty)
                 Text(
                   progressSummary,
@@ -805,61 +627,6 @@ class HomeScreen extends ConsumerWidget {
                   ProgressMetricRowWidget(row: row),
                   if (row != progress.metricRows.last) const SizedBox(height: 8),
                 ],
-              if (!hasAnyLogs) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBEB),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFFDE68A),
-                      width: 1.2,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/images/celebration_star.jpg',
-                          width: 48,
-                          height: 48,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.star_rounded,
-                            color: Color(0xFFD97706),
-                            size: 32,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome, ${child.name}!',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: const Color(0xFF92400E),
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Welcome to ${child.name}\'s school year! Log your first lesson below to start tracking your hours and days.',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: const Color(0xFFB45309),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
         );
@@ -875,68 +642,36 @@ class HomeScreen extends ConsumerWidget {
       children: [
         Expanded(
           child: Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFFFFBEB),
-                  theme.colorScheme.surface,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: const Color(0xFFFDE68A),
-                width: 1.2,
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.7),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.wb_sunny_rounded,
-                        size: 18,
-                        color: Color(0xFFD97706),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'TODAY',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFF92400E),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ],
+                Text(
+                  'TODAY',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
                 todayAsync.when(
                   loading: () => const Text('...'),
-                  error: (_, _) => const Text('0 min'),
+                  error: (context, stackTrace) => const Text('0 min'),
                   data: (mins) => Text(
                     formatMinutes(mins),
                     key: const ValueKey('home_today_total_text'),
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
-                      color: const Color(0xFF78350F),
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -947,68 +682,36 @@ class HomeScreen extends ConsumerWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFEEF2FF),
-                  theme.colorScheme.surface,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: const Color(0xFFC7D2FE),
-                width: 1.2,
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.7),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF4F46E5).withValues(alpha: 0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE0E7FF),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.auto_graph_rounded,
-                        size: 18,
-                        color: Color(0xFF4F46E5),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'THIS WEEK',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFF3730A3),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ],
+                Text(
+                  'THIS WEEK',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
                 weekAsync.when(
                   loading: () => const Text('...'),
-                  error: (_, _) => const Text('0 min'),
+                  error: (context, stackTrace) => const Text('0 min'),
                   data: (mins) => Text(
                     formatMinutes(mins),
                     key: const ValueKey('home_week_total_text'),
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
-                      color: const Color(0xFF312E81),
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
